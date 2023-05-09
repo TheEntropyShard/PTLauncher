@@ -6,7 +6,10 @@ The idea of this launcher was inspired by [this launcher](https://github.com/pro
 Launcher comes with AIR (Windows only) and slightly modified [client-chainloader](https://github.com/protanki-re/client-chainloader). <br>
 This launcher will only be useful for you if you are playing on custom server, otherwise you would probably use the official launcher.
 
+In the beginning, I made this launcher for my experiments, but since people have reverse-engineered the new ProTanki protocol, I decided to publish it.
+
 Custom servers:
+ - https://github.com/Assasans/protanki-server (Currently unmaintained)
  - https://github.com/DaniloPalmeira/protanki-server
  - https://github.com/WolverinDEV/protanki-protocol-rs (This one is not a server, but still may be useful)
 
