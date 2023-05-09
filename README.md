@@ -17,6 +17,7 @@ cd PTLauncher
 mvn clean compile assembly:single
 java -jar target/ptlauncher-1.0-jar-with-dependencies.jar
 ```
+In the default profile do not forget to edit path to library.swf or create new profile
 
 ![Screenshot.png](Screenshot.png)
 
