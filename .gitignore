@@ -33,3 +33,9 @@ target/
 profiles.json
 
 !air.zip
+
+!libs/*.*
+
+Instances/
+
+tmp/
