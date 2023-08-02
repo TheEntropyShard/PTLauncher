@@ -12,6 +12,7 @@ Custom servers:
  - https://github.com/Assasans/protanki-server (Currently unmaintained)
  - https://github.com/DaniloPalmeira/protanki-server
  - https://github.com/WolverinDEV/protanki-protocol-rs (This one is not a server, but still may be useful)
+ - https://github.com/Luminate-D/protanki-server - A pretty new server, implemented in Java
 
 ### Quick start
 ```shell
