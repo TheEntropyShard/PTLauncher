@@ -17,8 +17,22 @@
 
 package me.theentropyshard.ptlauncher;
 
+import com.formdev.flatlaf.FlatIntelliJLaf;
+
+import javax.swing.*;
+
+/**
+ * Launcher class
+ */
 public class Main {
     public static void main(String[] args) {
-        new PTLauncher();
+        JDialog.setDefaultLookAndFeelDecorated(true);
+        JFrame.setDefaultLookAndFeelDecorated(true);
+        FlatIntelliJLaf.setup();
+
+        UIManager.getDefaults().put("Button.showMnemonics", true);
+        UIManager.getDefaults().put("Component.hideMnemonics", false);
+
+        SwingUtilities.invokeLater(PTLauncher::new);
     }
 }

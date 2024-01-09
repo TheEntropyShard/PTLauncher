@@ -17,95 +17,80 @@
 
 package me.theentropyshard.ptlauncher;
 
-import com.formdev.flatlaf.FlatIntelliJLaf;
-import me.theentropyshard.ptlauncher.utils.PathUtils;
-import me.theentropyshard.ptlauncher.utils.Utils;
+import me.theentropyshard.ptlauncher.controller.Controller;
+import me.theentropyshard.ptlauncher.view.View;
 
-import javax.swing.*;
-import java.awt.*;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Objects;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-public class PTLauncher {
-    private final Path cwd;
-    private Path defaultRuntimePath;
+public final class PTLauncher {
+    private final File cwd;
+    private final File runtimeDir;
+    private final File tmpDir;
+    private final File profilesFile;
 
     public PTLauncher() {
-        this.cwd = Utils.getAppDir("PTLauncher");
-
-        try {
-            this.setupDirectories();
-        } catch (IOException e) {
-            throw new RuntimeException(e);
+        if(instance != null) {
+            throw new IllegalStateException("PTLauncher already created");
         }
+        instance = this;
 
-        this.initGUI();
+        this.cwd = new File(System.getProperty("user.dir"));
+        this.runtimeDir = new File(this.cwd, "runtime");
+        this.tmpDir = Utils.createFileOrDir(new File(this.cwd, "tmp"), true);
 
-        try {
-            Path airRuntimePath = this.cwd.resolve("air_runtime");
-            if (!Files.exists(airRuntimePath) || Files.size(airRuntimePath) == 0L) {
-                Files.createDirectories(airRuntimePath);
-                this.unzipAIR(airRuntimePath.toFile());
-                this.defaultRuntimePath = airRuntimePath;
-
-                System.out.println("Unzipped AIR");
-            } else {
-                System.out.println("AIR already unzipped");
+        if(!this.runtimeDir.exists()) {
+            System.out.println("Runtime dir does not exist, unpacking AIR");
+            Utils.createFileOrDir(this.runtimeDir, true);
+            try {
+                this.unzipAIR();
+            } catch (IOException e) {
+                System.err.println("Could not unzip AIR");
+                e.printStackTrace();
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    private void setupDirectories() throws IOException {
-        PathUtils.createDirectory(this.cwd);
-    }
-
-    private void initGUI() {
-        if (GraphicsEnvironment.isHeadless()) {
-            System.err.println("Your graphics environment is headless");
-            System.exit(1);
+            System.out.println("Unpacked AIR");
+        } else {
+            System.out.println("AIR already unpacked");
         }
 
-        JDialog.setDefaultLookAndFeelDecorated(true);
-        JFrame.setDefaultLookAndFeelDecorated(true);
-        FlatIntelliJLaf.setup();
+        this.profilesFile = Utils.createFileOrDir(new File(this.cwd, "profiles.json"), false);
+
+        View view = new View("PTLauncher");
+        new Controller(view);
+
+        view.setVisible(true);
     }
 
-    private void unzipAIR(File runtimeDir) throws IOException {
-        InputStream is = Objects.requireNonNull(PTLauncher.class.getResourceAsStream("/runtimes/air.zip"));
-        ZipInputStream zis = new ZipInputStream(is);
+    private void unzipAIR() throws IOException {
+        byte[] buffer = new byte[1024];
+        ZipInputStream zis = new ZipInputStream(Objects.requireNonNull(PTLauncher.class.getResourceAsStream("/air.zip")));
         ZipEntry zipEntry = zis.getNextEntry();
-        while (zipEntry != null) {
-            File newFile = new File(runtimeDir, zipEntry.getName());
+        while(zipEntry != null) {
+            File newFile = new File(this.runtimeDir, zipEntry.getName());
 
-            String destDirPath = runtimeDir.getCanonicalPath();
+            String destDirPath = this.runtimeDir.getCanonicalPath();
             String destFilePath = newFile.getCanonicalPath();
 
             if (!destFilePath.startsWith(destDirPath + File.separator)) {
                 throw new IOException("Entry is outside of the target dir: " + zipEntry.getName());
             }
-            if (zipEntry.isDirectory()) {
-                if (!newFile.isDirectory() && !newFile.mkdirs()) {
+            if(zipEntry.isDirectory()) {
+                if(!newFile.isDirectory() && !newFile.mkdirs()) {
                     throw new IOException("Failed to create directory " + newFile);
                 }
             } else {
                 File parent = newFile.getParentFile();
-                if (!parent.isDirectory() && !parent.mkdirs()) {
+                if(!parent.isDirectory() && !parent.mkdirs()) {
                     throw new IOException("Failed to create directory " + parent);
                 }
 
                 FileOutputStream fos = new FileOutputStream(newFile);
-                byte[] buffer = new byte[4096];
                 int len;
-                while ((len = zis.read(buffer)) > 0) {
+                while((len = zis.read(buffer)) > 0) {
                     fos.write(buffer, 0, len);
                 }
                 fos.close();
@@ -117,7 +102,21 @@ public class PTLauncher {
         zis.close();
     }
 
-    public Path getDefaultRuntimePath() {
-        return this.defaultRuntimePath;
+    public File getCwd() {
+        return this.cwd;
+    }
+
+    public File getTmpDir() {
+        return this.tmpDir;
+    }
+
+    public File getProfilesFile() {
+        return this.profilesFile;
+    }
+
+    private static PTLauncher instance;
+
+    public static PTLauncher getInstance() {
+        return instance;
     }
 }
