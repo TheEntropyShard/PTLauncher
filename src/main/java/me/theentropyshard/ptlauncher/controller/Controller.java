@@ -147,7 +147,7 @@ public class Controller {
                         "-runtime", Paths.get("runtime\\win").toRealPath().toString(),
                         "",
                         "-profile", "desktop",
-                        "tmp\\" + tempAppDescriptor.getName(), "./"
+                        tempAppDescriptor.getAbsolutePath(), "./"
                 ).start();
                 new Thread(() -> {
                     Scanner inputStreamSc = new Scanner(this.currentProcess.getInputStream());
