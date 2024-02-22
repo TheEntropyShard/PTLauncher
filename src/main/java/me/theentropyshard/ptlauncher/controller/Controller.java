@@ -145,7 +145,6 @@ public class Controller {
                 this.currentProcess = new ProcessBuilder().command(
                         Paths.get("runtime\\adl.exe").toRealPath().toString(),
                         "-runtime", Paths.get("runtime\\win").toRealPath().toString(),
-                        "",
                         "-profile", "desktop",
                         tempAppDescriptor.getAbsolutePath(), "./"
                 ).start();

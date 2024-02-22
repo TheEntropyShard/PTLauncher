@@ -24,6 +24,8 @@ hs_err_pid*
 
 .idea/
 
+tmp/
+
 runtime/
 
 target/
